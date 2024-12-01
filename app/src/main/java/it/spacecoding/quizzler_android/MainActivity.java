@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -12,6 +14,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
     // TODO: Declare constants here
 
@@ -19,22 +23,27 @@ public class MainActivity extends AppCompatActivity {
     // TODO: Declare member variables here:
     Button mTrueButton;
     Button mFalseButton;
+    TextView mQuestionTextView;
+    TextView mScoreTextView;
+    ProgressBar mProgressBar;
+    int mIndex = 0;
+    int mQuestion;
     // TODO: Uncomment to create question bank
-//    private TrueFalse[] mQuestionBank = new TrueFalse[] {
-//            new TrueFalse(R.string.question_1, true),
-//            new TrueFalse(R.string.question_2, true),
-//            new TrueFalse(R.string.question_3, true),
-//            new TrueFalse(R.string.question_4, true),
-//            new TrueFalse(R.string.question_5, true),
-//            new TrueFalse(R.string.question_6, false),
-//            new TrueFalse(R.string.question_7, true),
-//            new TrueFalse(R.string.question_8, false),
-//            new TrueFalse(R.string.question_9, true),
-//            new TrueFalse(R.string.question_10, true),
-//            new TrueFalse(R.string.question_11, false),
-//            new TrueFalse(R.string.question_12, false),
-//            new TrueFalse(R.string.question_13,true)
-//    };
+    private TrueFalse[] mQuestionBank = new TrueFalse[] {
+            new TrueFalse(R.string.question_1, true),
+            new TrueFalse(R.string.question_2, true),
+            new TrueFalse(R.string.question_3, true),
+            new TrueFalse(R.string.question_4, true),
+            new TrueFalse(R.string.question_5, true),
+            new TrueFalse(R.string.question_6, false),
+            new TrueFalse(R.string.question_7, true),
+            new TrueFalse(R.string.question_8, false),
+            new TrueFalse(R.string.question_9, true),
+            new TrueFalse(R.string.question_10, true),
+            new TrueFalse(R.string.question_11, false),
+            new TrueFalse(R.string.question_12, false),
+            new TrueFalse(R.string.question_13,true)
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,24 +54,43 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        // link agli elementi della UI
         mTrueButton = (Button) findViewById(R.id.true_button);
         mFalseButton = (Button) findViewById(R.id.false_button);
+        mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
 
-        View.OnClickListener myListener = new View.OnClickListener() {
+        // estrapoliamo la domanda dalla questionBank
+        mQuestion = mQuestionBank[mIndex].getQuestionID();
+        mQuestionTextView.setText(mQuestion);
+
+
+        mTrueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("MainActivity", "onClick called");
-                Toast myToast = Toast.makeText(getApplicationContext(), "True pressed!", Toast.LENGTH_SHORT);
-                myToast.show();
+                checkAnswer(true);
+                updateQuestion();
             }
-        };
-        mTrueButton.setOnClickListener(myListener);
+        });
         mFalseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast myToast = Toast.makeText(getApplicationContext(), "False pressed!", Toast.LENGTH_SHORT);
-                myToast.show();
+                checkAnswer(false);
+                updateQuestion();
             }
         });
     }
+    private void updateQuestion(){
+        mIndex = (mIndex + 1) % mQuestionBank.length;
+        mQuestion = mQuestionBank[mIndex].getQuestionID();
+        mQuestionTextView.setText(mQuestion);
+    }
+    private void checkAnswer(boolean userSelection){
+        boolean correctAnswer = mQuestionBank[mIndex].isAnswer();
+        if(userSelection == correctAnswer){
+            Toast.makeText(getApplicationContext(),R.string.correct_toast,Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getApplicationContext(),R.string.incorrect_toast,Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }
