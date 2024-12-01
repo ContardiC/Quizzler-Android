@@ -1,5 +1,7 @@
 package it.spacecoding.quizzler_android;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +19,6 @@ import androidx.core.view.WindowInsetsCompat;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-    // TODO: Declare constants here
 
 
     // TODO: Declare member variables here:
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar mProgressBar;
     int mIndex = 0;
     int mQuestion;
+    int mScore = 0;
+
     // TODO: Uncomment to create question bank
     private TrueFalse[] mQuestionBank = new TrueFalse[] {
             new TrueFalse(R.string.question_1, true),
@@ -44,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
             new TrueFalse(R.string.question_12, false),
             new TrueFalse(R.string.question_13,true)
     };
+
+    // TODO: Declare constants here
+    final int PROGRESS_BAR_INCREMENT = (int) Math.ceil(100.0 / mQuestionBank.length);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         mTrueButton = (Button) findViewById(R.id.true_button);
         mFalseButton = (Button) findViewById(R.id.false_button);
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
+        mScoreTextView = (TextView) findViewById(R.id.score);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         // estrapoliamo la domanda dalla questionBank
         mQuestion = mQuestionBank[mIndex].getQuestionID();
@@ -81,13 +89,30 @@ public class MainActivity extends AppCompatActivity {
     }
     private void updateQuestion(){
         mIndex = (mIndex + 1) % mQuestionBank.length;
+        if(mIndex == 0){
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setTitle("Game Over");
+            alert.setCancelable(false);
+            alert.setMessage("You scored " + mScore + " points!");
+            alert.setPositiveButton("Close Application", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish(); // chiudo l'applicazione
+                }
+            });
+            alert.show();
+        }
         mQuestion = mQuestionBank[mIndex].getQuestionID();
         mQuestionTextView.setText(mQuestion);
+        mProgressBar.incrementProgressBy(PROGRESS_BAR_INCREMENT);
+        mScoreTextView.setText("Score " +mScore + "/" + mQuestionBank.length );
+
     }
     private void checkAnswer(boolean userSelection){
         boolean correctAnswer = mQuestionBank[mIndex].isAnswer();
         if(userSelection == correctAnswer){
             Toast.makeText(getApplicationContext(),R.string.correct_toast,Toast.LENGTH_SHORT).show();
+            mScore += 1;
         }else{
             Toast.makeText(getApplicationContext(),R.string.incorrect_toast,Toast.LENGTH_SHORT).show();
         }
