@@ -27,9 +27,9 @@ public class MainActivity extends AppCompatActivity {
     TextView mQuestionTextView;
     TextView mScoreTextView;
     ProgressBar mProgressBar;
-    int mIndex = 0;
+    int mIndex;
     int mQuestion;
-    int mScore = 0;
+    int mScore;
 
     // TODO: Uncomment to create question bank
     private TrueFalse[] mQuestionBank = new TrueFalse[] {
@@ -53,6 +53,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // controlliamo savedInstanceState per verificare se abbiamo una configurazione precedente
+        if(savedInstanceState != null){
+            mScore = savedInstanceState.getInt("ScoreKey");
+            mIndex = savedInstanceState.getInt("IndexKey");
+        }else{
+            mScore = 0;
+            mIndex = 0;
+        }
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.activity_main), (v, insets) -> {
@@ -70,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         // estrapoliamo la domanda dalla questionBank
         mQuestion = mQuestionBank[mIndex].getQuestionID();
         mQuestionTextView.setText(mQuestion);
+        mScoreTextView.setText("Score " +mScore + "/" + mQuestionBank.length );
 
 
         mTrueButton.setOnClickListener(new View.OnClickListener() {
@@ -117,5 +126,12 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),R.string.incorrect_toast,Toast.LENGTH_SHORT).show();
         }
     }
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        // salviamo le informazioni con chiave - valore
+        outState.putInt("ScoreKey",mScore); // il punteggio
+        outState.putInt("IndexKey",mIndex); // l'indice della domanda corrente
+    }
+
 
 }
